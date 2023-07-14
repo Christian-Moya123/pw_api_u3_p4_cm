@@ -22,6 +22,7 @@ public class MateriaControllerRestFul {
 	//GET
 	@GetMapping(path="/buscar")
 	public Materia consultarPorCodigo() {
+		
 		String codigo = "aa11";
 		return this.materiaService.consultarPorCodigo(codigo);
 	}
