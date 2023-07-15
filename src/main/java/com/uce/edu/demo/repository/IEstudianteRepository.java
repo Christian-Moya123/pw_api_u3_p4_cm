@@ -7,6 +7,7 @@ import com.uce.edu.demo.repository.modelo.Estudiante;
 public interface  IEstudianteRepository {
 	public Estudiante seleccionarPorCedula(String cedula);
 	public void insertarEstudiante(Estudiante estudiante);
+	
 	public void actualizarEstudiante(Estudiante estudiante);
 	public void actualizarParcialEstudiante(String cedulaActual, String cedulaNueva);
 	public  void borrar(Integer id);
