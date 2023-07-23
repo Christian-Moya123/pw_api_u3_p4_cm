@@ -2,6 +2,11 @@ package com.uce.edu.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uce.edu.demo.repository.modelo.Estudiante;
@@ -26,16 +32,43 @@ public class EstudianteControllerRestFul {
 
 	//GET
 	@GetMapping(path="/{cedula}")
-	public Estudiante consultarPorCedula(@PathVariable String cedula) {
+	public ResponseEntity<Estudiante> consultarPorCedula(@PathVariable String cedula) {
 		//String cedula = "1234567890";
-		return this.estudianteService.consultarPorCedula(cedula);
+		
+		return ResponseEntity.status(227).body(this.estudianteService.consultarPorCedula(cedula));
 	}
 	
-	@PostMapping
+	//GET
+		@GetMapping(path="/status/{cedula}")
+		
+		public ResponseEntity<Estudiante> consultarPorCedulaStatus(@PathVariable String cedula) {
+			//String cedula = "1234567890";
+			
+			return ResponseEntity.status(HttpStatus.OK).body(this.estudianteService.consultarPorCedula(cedula));
+		}
+	
+		//GET
+		@GetMapping(path="/produces/{cedula}", produces = MediaType.APPLICATION_XML_VALUE)
+		@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+		public Estudiante consultarPorCedulaProduces(@PathVariable String cedula) {
+			//return ResponseEntity.status(227).body(this.estudianteService.consultarPorCedula(cedula));
+			return this.estudianteService.consultarPorCedula(cedula);
+		}
+		
+		
+		
+	@PostMapping(consumes = MediaType.APPLICATION_XML_VALUE)
 	public void guardar(@RequestBody Estudiante estudiante) {
 		this.estudianteService.guardarEstudiante(estudiante);
 		
 	}
+	
+	@PostMapping(path="/guardar", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
+	public Estudiante guardar2(@RequestBody Estudiante estudiante) {
+		this.estudianteService.guardarEstudiante(estudiante);
+		return this.consultarPorCedulaProduces(estudiante.getCedula());
+	}
+
 	
 	@PutMapping(path="/{identificador}")
 	public void actualizar(@RequestBody Estudiante estudiante, @PathVariable Integer identificador){
@@ -65,9 +98,15 @@ public class EstudianteControllerRestFul {
 	}
 	
 	@GetMapping
-	public List<Estudiante> buscarTodos(){
+	public ResponseEntity<List<Estudiante>> buscarTodos(){
 		//buscarTodos?provincia=pichincha
-		return this.estudianteService.buscarTodos();
+		
+		
+		List<Estudiante> lista = null;
+		HttpHeaders cabezeras = new  HttpHeaders();
+		cabezeras.add("detalleMensaje", "Ciudadanos consultados  exitosamente");
+		cabezeras.add("valorAPI", "incalculable");
+		return new ResponseEntity<>(lista,cabezeras,228);
 	}
 
 }
