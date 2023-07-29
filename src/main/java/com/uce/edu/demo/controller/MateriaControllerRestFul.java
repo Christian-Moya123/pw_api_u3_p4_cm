@@ -3,6 +3,7 @@ package com.uce.edu.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +19,7 @@ import com.uce.edu.demo.repository.modelo.Estudiante;
 import com.uce.edu.demo.repository.modelo.Materia;
 import com.uce.edu.demo.service.IEstudianteService;
 import com.uce.edu.demo.service.IMateriaService;
+import com.uce.edu.demo.service.to.MateriaTO;
 
 @RestController
 @RequestMapping("/materias")
@@ -69,6 +71,11 @@ public class MateriaControllerRestFul {
 	public List<Materia> buscarTodos(@RequestParam String provincia){
 		//buscarTodos?provincia=pichincha
 		return this.materiaService.buscarTodosMateria();
+	}
+	
+	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public MateriaTO consultarPorId(@PathVariable Integer id) {
+		return this.materiaService.buscarPorId(id);
 	}
 
 

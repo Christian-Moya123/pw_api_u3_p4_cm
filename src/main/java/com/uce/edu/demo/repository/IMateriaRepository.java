@@ -15,5 +15,7 @@ public interface IMateriaRepository {
 	public  void borrar(Integer id);
 	public Materia borrarPorIdMateria(Integer id);
 	public List<Materia> seleccionarTodosMateria();
+	public List<Materia> buscarPorCedulaEstudiante(String cedula);
+	public Materia buscarPorId(Integer id);
 
 }

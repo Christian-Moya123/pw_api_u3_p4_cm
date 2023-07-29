@@ -21,7 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uce.edu.demo.repository.modelo.Estudiante;
 import com.uce.edu.demo.service.IEstudianteService;
+import com.uce.edu.demo.service.IMateriaService;
+import com.uce.edu.demo.service.to.EstudianteTO;
+import com.uce.edu.demo.service.to.MateriaTO;
 
+import org.springframework.hateoas.Link;
+
+//Importacion estática
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;;
 
 @RestController
 @RequestMapping("/estudiantes")
@@ -29,6 +37,9 @@ public class EstudianteControllerRestFul {
 	
 	@Autowired
 	private IEstudianteService estudianteService;
+	
+	@Autowired
+	private IMateriaService iMateriaService;
 
 	//GET
 	@GetMapping(path="/{cedula}")
@@ -97,16 +108,31 @@ public class EstudianteControllerRestFul {
 		
 	}
 	
-	@GetMapping
-	public ResponseEntity<List<Estudiante>> buscarTodos(){
-		//buscarTodos?provincia=pichincha
-		
-		
-		List<Estudiante> lista = null;
-		HttpHeaders cabezeras = new  HttpHeaders();
-		cabezeras.add("detalleMensaje", "Ciudadanos consultados  exitosamente");
-		cabezeras.add("valorAPI", "incalculable");
-		return new ResponseEntity<>(lista,cabezeras,228);
+	@GetMapping(path="/hateoas" , produces = MediaType.APPLICATION_JSON_VALUE)//path didactico, no se debe usar verbos
+	public ResponseEntity<List<EstudianteTO>> consultarTodosHATEOAS(){
+		List<EstudianteTO> lista = this.estudianteService.buscarTodosHATEOAS();
+		//link de hypermedia para cada objeto
+		for(EstudianteTO e: lista) {
+			Link myLink = linkTo(methodOn(EstudianteControllerRestFul.class)
+					.consultarPorCedula(e.getCedula()))
+					.withRel("materias");
+
+			e.add(myLink);
+
+		}
+		return new ResponseEntity<>(lista, null, 200);
+	}
+
+	@GetMapping(path = "/{cedula}/materias", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<MateriaTO>> buscarPorEstudiante(@PathVariable String cedula) {
+		List<MateriaTO> lista = this.iMateriaService.buscarPorCedulaEstudiante(cedula);
+		for (MateriaTO mat : lista) {
+			Link myLink = linkTo(methodOn(MateriaControllerRestFul.class).consultarPorId(mat.getId()))
+					.withRel("materia");
+			mat.add(myLink);
+		}
+
+		return new ResponseEntity<>(lista, null, 200);
 	}
 
 }
